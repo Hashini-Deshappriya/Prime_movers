@@ -13,14 +13,15 @@ public class Prime_movers extends AlphaBot
 
 	boolean peek;
 	double moveAmount;
+	boolean movingForward;
 
 	public void run() {
 	
-		setBodyColor(Color.red);
-		setGunColor(Color.red);
-		setRadarColor(Color.orange);
-		setBulletColor(Color.red);
-		setScanColor(Color.red);
+		setBodyColor(Color.green);
+		setGunColor(Color.green);
+		setRadarColor(Color.green);
+		setBulletColor(Color.green);
+		setScanColor(Color.green);
 	
 		moveAmount = Math.max(getBattleFieldWidth(), getBattleFieldHeight());
 		
@@ -50,19 +51,29 @@ public class Prime_movers extends AlphaBot
 		  if (getGunHeat() == 0) {
        fire(Rules.MAX_BULLET_POWER);
    }
-	
+
+      
+      
+   
 		if (peek) {
 			scan();
 		}
 	}
 
-	public void onHitRobot(HitRobotEvent e) {
-	
-		if (e.getBearing() > -90 && e.getBearing() < 90) {
-			back(100);
+
+public void reverseDirection() {
+		if (movingForward) {
+			back(40000);
+			movingForward = false;
+		} else {
+			ahead(40000);
+			movingForward = true;
 		}
-		else {
-			ahead(100);
+	}
+public void onHitRobot(HitRobotEvent e) {
+		
+		if (e.isMyFault()) {
+			reverseDirection();
 		}
 	}
 
