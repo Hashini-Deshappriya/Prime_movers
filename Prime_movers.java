@@ -1,68 +1,86 @@
-
 import robocode.*;
 import java.awt.Color;
+import java.awt.*;
+import robocode.HitRobotEvent;
+import robocode.Robot;
+import robocode.ScannedRobotEvent;
+import static robocode.util.Utils.normalRelativeAngleDegrees;
 
 
-public class Prime_movers extends BravoBot
+
+public class Prime_movers extends CharlieBot
 {
-	int turnDirection = 1; 
-	public void run() {
+
+boolean peek;
+    double moveAmount;
+    boolean movingForward;
+
+    public void run() {
+    
+        setBodyColor(Color.green);
+        setGunColor(Color.green);
+        setRadarColor(Color.green);
+        setBulletColor(Color.green);
+        setScanColor(Color.green);
+    
+        moveAmount = Math.max(getBattleFieldWidth(), getBattleFieldHeight());
+        
+        peek = false;
+
+        
+        turnLeft(getHeading() % 90);
+        ahead(moveAmount);
+    
+        peek = true;
+        turnGunRight(90);
+        turnRight(90);
+
+        while (true) {
+            
+            peek = true;
+        
+            ahead(moveAmount);
+            
+            peek = false;
+        
+            turnRight(90);
+        }
+    }
+public void onRobotDetected(ScannedRobotEvent e) {
+    turnGunRight(180);
+    fire(10);
+	turnRadarLeft(180);
+     turnGunRight(-180);
+	 fire(10);
 	
-		setBodyColor(Color.black);
-		setGunColor(Color.black);
-		setRadarColor(Color.black);
-	while (true) {
-			turnRight(5 * turnDirection);
-		}
-	}
+	  turnGunRight(-180);
+	 fire(10);
+	  
+    if (peek) {
+            scan();
+        }
+}
+public void reverseDirection() {
+        if (movingForward) {
+            back(40000);
+            movingForward = false;
+        } else {
+            ahead(40000);
+            movingForward = true;
+        }
+    }
+public void onHitRobot(HitRobotEvent e) {
+        
+        if (e.isMyFault()) {
+            reverseDirection();
+        }
+    }
+
+    public void onHitByBullet(HitByBulletEvent e) {
+    
+        back(200);
+    }
+    
 
 
-	public void onScannedRobot(ScannedRobotEvent e) {
-	
-		  if (getGunHeat() == 0) {
-          fire(Rules.MAX_BULLET_POWER);}
-	   
-		if (e.getBearing() >= 0) {
-			turnDirection = 1;
-		} else {
-			turnDirection = -1;
-		}
-
-		turnRight(e.getBearing());
-		ahead(e.getDistance() + 5);
-		scan(); 
-	}
-	public void onHitRobot(HitRobotEvent e) {
-		if (e.getBearing() >= 0) {
-			turnDirection = 1;
-		} else {
-			turnDirection = -1;
-		}
-		turnRight(e.getBearing());
-
-		
-		if (e.getEnergy() > 16) {
-			fire(3);
-		} else if (e.getEnergy() > 10) {
-			fire(2);
-		} else if (e.getEnergy() > 4) {
-			fire(1);
-		} else if (e.getEnergy() > 2) {
-			fire(.5);
-		} else if (e.getEnergy() > .4) {
-			fire(.1);
-		}
-		ahead(40);
-	}
-
-	public void onHitByBullet(HitByBulletEvent e) {
-	
-		back(100);
-	}
-	
-
-	public void onHitWall(HitWallEvent e) {
-	
-		back(20);
-	}	
 }
